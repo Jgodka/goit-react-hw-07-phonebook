@@ -1,9 +1,9 @@
 import { Formik, Field } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { getContacts } from 'redux/selectors';
+import { selectContacts } from 'redux/selectors';
 import { nanoid } from 'nanoid';
-import { addContact } from 'redux/contactsSlice';
+import { addContact } from 'redux/operations';
 import {
   AddButton,
   StyledForm,
@@ -16,21 +16,21 @@ const quizSchema = Yup.object().shape({
     .min(2, 'Too Short!')
     .max(50, 'Too Long!')
     .required('Required'),
-  number: Yup.string()
+  phone: Yup.string()
     .min(7, 'At least 5 digits')
     .max(20, 'Too Long!')
     .required('Required'),
 });
 
 export const ContactForm = () => {
-  const dispatch = useDispatch(); 
-  const contacts = useSelector(getContacts); 
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
 
   const handleSubmit = (values, actions) => {
     const newContact = {
-      id: 'id-' + nanoid(),
+      id: nanoid(),
       name: values.name,
-      number: values.number,
+      phone: values.phone,
     };
 
     if (contacts.find(contact => contact.name === newContact.name)) {
@@ -40,11 +40,12 @@ export const ContactForm = () => {
     dispatch(addContact(newContact));
     actions.resetForm();
   };
+
   return (
     <Formik
       initialValues={{
         name: '',
-        number: '',
+        phone: '',
       }}
       validationSchema={quizSchema}
       onSubmit={handleSubmit}
@@ -57,8 +58,8 @@ export const ContactForm = () => {
         </StyledLabel>
         <StyledLabel>
           Number
-          <Field type="tel" name="number" />
-          <ErrorMsg type="tel" name="number" component="div" />
+          <Field type="tel" name="phone" />
+          <ErrorMsg type="tel" name="phone" component="div" />
         </StyledLabel>
 
         <AddButton type="submit">Add contact</AddButton>
